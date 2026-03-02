@@ -32,7 +32,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.jetbrains:annotations:23.0.0'
 	implementation 'com.vaadin.external.google:android-json:0.0.20131108.vaadin1'
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.5'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.6'
 	implementation 'com.google.code.gson:gson:2.8.6'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.amqp:spring-rabbit-test'
@@ -53,7 +53,8 @@ dependencies {
 	implementation 'org.springframework.vault:spring-vault-core'
 
 	implementation"org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14"
-	implementation 'org.springframework.boot:spring-boot-starter-undertow'
+	// Source: https://mvnrepository.com/artifact/io.undertow/undertow-core
+	implementation("io.undertow:undertow-core:2.3.21.Final")
 }
 
 
