@@ -39,10 +39,10 @@ public class KycOrganizationController {
             return ResponseEntity.ok(response.toString());
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"success\": false, \"message\": \"Invalid JSON format\"}");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"success\": false, \"message\": \"Error saving organization\"}");
         }
     }

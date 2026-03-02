@@ -208,7 +208,7 @@ public class AggCount {
             jsonObject.put("countOfAuthenticationsFailed",countOfAuthenticationsFailed);
             return jsonObject.toString().replace("\\\\","");
 		} catch (Exception e) {
-			e.printStackTrace();
+            System.out.println(e.getMessage());
 			return jsonObject.toString().replace("\\\\","");
 		}
         

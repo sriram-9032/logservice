@@ -96,7 +96,7 @@ public class EnterpriseController {
             jsonObject.put("result",result);
             return jsonObject.toString();
         }catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return null;
         }
     }

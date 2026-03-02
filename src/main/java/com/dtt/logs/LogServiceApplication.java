@@ -31,7 +31,7 @@ public class LogServiceApplication {
 			}
 			return "Started";
 		} catch (PKICoreServiceException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return "Failed";
 		}
 	}

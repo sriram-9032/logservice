@@ -38,7 +38,7 @@ import com.dtt.logs.dto.service.OtpDTO;
 import com.dtt.logs.dto.service.PageDTO;
 
 import com.dtt.logs.enums.service.ServiceName;
-import com.dtt.logs.enums.TransactionType;
+import com.dtt.logs.enums.service.TransactionType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -130,8 +130,8 @@ public class ObLogController {
 
             Page<ServiceAuditLog> auditLogPage = this.pageService.authFailMatchFilters(list, authPageDTO, pageable);
             return this.pageService.getPages(auditLogPage);
-        } catch (Exception var9) {
-            var9.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -236,7 +236,7 @@ public class ObLogController {
             System.out.println("Encrypted value "+ result.getResponse());
             return new String(result.getResponse());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return e.getMessage();
         }
     }

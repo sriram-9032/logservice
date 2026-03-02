@@ -131,7 +131,7 @@ public class SSEController {
                 jsonObject.put("result", result);
                 return jsonObject.toString();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
                 return "{\"success\": false, \"message\": \"Error fetching audit logs\"}";
             }
         }).onErrorReturn("{\"success\": false, \"message\": \"Streaming error occurred\"}");

@@ -320,7 +320,7 @@ public class CentralLogController {
             countSpService.postDayCount(auditLog);
             System.out.println(message + "\n");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

@@ -407,7 +407,7 @@ public class KycLogController {
 
             return response.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return "{\"success\": false, \"message\": \"Error fetching logs\"}";
         }
     }

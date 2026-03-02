@@ -36,7 +36,7 @@ import com.dtt.logs.dto.service.OtpDTO;
 import com.dtt.logs.dto.service.PageDTO;
 import com.dtt.logs.Model.ServiceAuditLog;
 import com.dtt.logs.enums.service.ServiceName;
-import com.dtt.logs.enums.TransactionType;
+import com.dtt.logs.enums.service.TransactionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -147,7 +147,7 @@ public class SigningLogController {
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -231,7 +231,7 @@ public class SigningLogController {
             Result result = DAESService.encryptData(s);
             return new String(result.getResponse());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return e.getMessage();
         }
     }
