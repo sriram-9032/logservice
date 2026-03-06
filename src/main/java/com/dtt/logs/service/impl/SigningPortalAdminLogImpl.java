@@ -105,7 +105,7 @@ public class SigningPortalAdminLogImpl implements SigningPortalLogIface {
             String checksum= auditDTO.getChecksum();
             ServiceAuditLog auditLog= new ServiceAuditLog(identifier,correlationID,tid,stid,time,stime,etime,loc,callStack,serviceName,
                     transactionType,transactionSubType,logMessageType,msg,spname,spappname,
-                    signatureType,eseal,checksum,null );
+                    signatureType,eseal,checksum,null,null );
             addAudit(auditLog);
             return auditLog;
         }catch(Exception e){

@@ -28,6 +28,7 @@ import jakarta.validation.constraints.NotNull;
         def = "{'serviceProviderName': 1, 'serviceName': 1, 'logMessageType': 1, 'timestamp': -1}"
 )
 
+
 public class AuditLog {
 
 
@@ -124,7 +125,8 @@ public class AuditLog {
     @Field("transactionPrice")
     private String transactionPrice;
 
-
+    @Field("userActivityType")
+    private UserActivityType userActivityType;
     public AuditLog() {
     }
 
@@ -149,7 +151,7 @@ public class AuditLog {
             SignatureType signatureType,
             Boolean eSealUsed,
             String checksum,
-            String deviceId, String sdkType, String sdkVersion, String transactionPrice, AuthenticationType authenticationType) {
+            String deviceId, String sdkType, String sdkVersion, String transactionPrice, AuthenticationType authenticationType, UserActivityType userActivityType) {
 
         this.identifier = identifier;
         this.correlationID = correlationID;
@@ -175,6 +177,7 @@ public class AuditLog {
         this.sdkType = sdkType;
         this.transactionPrice = transactionPrice;
         this.authenticationType = authenticationType;
+        this.userActivityType = userActivityType;
     }
 
     public String getIdentifier() {
@@ -369,6 +372,14 @@ public class AuditLog {
         this.authenticationType = authenticationType;
     }
 
+    public UserActivityType getUserActivityType() {
+        return userActivityType;
+    }
+
+    public void setUserActivityType(UserActivityType userActivityType) {
+        this.userActivityType = userActivityType;
+    }
+
     public ObjectId getId() {
         return id;
     }
@@ -407,6 +418,7 @@ public class AuditLog {
             jsonObject.put("sdkType", sdkType);
             jsonObject.put("transactionPrice", transactionPrice);
             jsonObject.put("authenticationType", authenticationType);
+            jsonObject.put("userActivityType", userActivityType);
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();

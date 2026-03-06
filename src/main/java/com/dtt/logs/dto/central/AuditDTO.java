@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class AuditDTO implements Serializable {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@NotNull
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    @NotNull
     private ServiceName serviceName;
     @NotNull
     private TransactionType transactionType;
@@ -40,6 +40,7 @@ public class AuditDTO implements Serializable {
     @NotNull @NotEmpty
     private String checksum;
     private AuthenticationType authenticationType;
+    private UserActivityType userActivityType;
 
 // constructor shouldn't be invoked
 
@@ -196,6 +197,14 @@ public class AuditDTO implements Serializable {
         this.authenticationType = authenticationType;
     }
 
+    public UserActivityType getUserActivityType() {
+        return userActivityType;
+    }
+
+    public void setUserActivityType(UserActivityType userActivityType) {
+        this.userActivityType = userActivityType;
+    }
+
     @Override
     public String toString() {
         return "AuditDTO{" +
@@ -218,6 +227,7 @@ public class AuditDTO implements Serializable {
                 ", eSealUsed=" + eSealUsed +
                 ", checksum='" + checksum + '\'' +
                 ", authenticationType=" + authenticationType +
+                ", userActivityType=" + userActivityType +
                 '}';
     }
 }

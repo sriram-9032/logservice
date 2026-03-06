@@ -3,6 +3,7 @@ package com.dtt.logs.Model;
 import java.time.LocalDateTime;
 
 import com.dtt.logs.enums.central.AuthenticationType;
+import com.dtt.logs.enums.central.UserActivityType;
 import jakarta.validation.constraints.NotEmpty;
 import org.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -119,7 +120,10 @@ public class ServiceAuditLog {
 
     private AuthenticationType authenticationType;
 
+    private UserActivityType userActivityType;
+
     public ServiceAuditLog() {
+
     }
 
     public ServiceAuditLog(String identifier, String correlationID, String transactionID, String subTransactionID,
@@ -127,7 +131,7 @@ public class ServiceAuditLog {
                            String startTime, String endTime, String geoLocation, String callStack,
                            ServiceName serviceName, TransactionType transactionType, String transactionSubType,
                            LogMessageType logMessageType, String logMessage, String serviceProviderName,
-                           String serviceProviderAppName, SignatureType signatureType, Boolean eSealUsed, String checksum, AuthenticationType authenticationType) {
+                           String serviceProviderAppName, SignatureType signatureType, Boolean eSealUsed, String checksum, AuthenticationType authenticationType, UserActivityType userActivityType) {
 
 
 
@@ -151,6 +155,7 @@ public class ServiceAuditLog {
         this.eSealUsed = eSealUsed;
         this.checksum = checksum;
         this.authenticationType = authenticationType;
+        this.userActivityType = userActivityType;
     }
 
     public ServiceName getServiceName() {
@@ -305,8 +310,21 @@ public class ServiceAuditLog {
         this.checksum = checksum;
     }
 
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
+    }
 
+    public void setAuthenticationType(AuthenticationType authenticationType) {
+        this.authenticationType = authenticationType;
+    }
 
+    public UserActivityType getUserActivityType() {
+        return userActivityType;
+    }
+
+    public void setUserActivityType(UserActivityType userActivityType) {
+        this.userActivityType = userActivityType;
+    }
 
     @SneakyThrows
     @Override
@@ -333,6 +351,7 @@ public class ServiceAuditLog {
             jsonObject.put("eSealUsed",eSealUsed);
             jsonObject.put("checksum",checksum);
             jsonObject.put("authenticationType",authenticationType);
+            jsonObject.put("userActivityType",userActivityType);
         } catch (Exception e) {
             e.printStackTrace();
             return jsonObject.toString();

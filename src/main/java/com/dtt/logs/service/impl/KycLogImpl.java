@@ -43,7 +43,6 @@ public class KycLogImpl implements KycLogIface {
     private final KycAuditRepository auditLogRepository;
 
 
-
     private final MongoTemplate mongoTemplate;
 
 
@@ -110,9 +109,8 @@ public class KycLogImpl implements KycLogIface {
                     : LocalDateTime.now();
 
 
-            System.out.println("response:::"+serviceName);
-            if (serviceName == ServiceName.OTHER)
-            {
+            System.out.println("response:::" + serviceName);
+            if (serviceName == ServiceName.OTHER) {
                 System.out.println("hiiiii");
                 SubTransactionsLog subTransactionsLog = new SubTransactionsLog(
                         dto.getIdentifier(),
@@ -139,12 +137,10 @@ public class KycLogImpl implements KycLogIface {
                         dto.getSdkVersion(),
                         dto.getTransactionPrice()
                 );
-                System.out.println("resppp::"+subTransactionsLog);
+                System.out.println("resppp::" + subTransactionsLog);
                 subTransactionLogRepository.insert(subTransactionsLog);
 
-            }
-
-            else {
+            } else {
                 AuditLog auditLog = new AuditLog(
                         dto.getIdentifier(),
                         dto.getCorrelationID(),
@@ -168,7 +164,7 @@ public class KycLogImpl implements KycLogIface {
                         dto.getDeviceId(),
                         dto.getSdkType(),
                         dto.getSdkVersion(),
-                        dto.getTransactionPrice(),null
+                        dto.getTransactionPrice(), null, null
                 );
                 auditLogRepository.insert(auditLog);
 
@@ -280,121 +276,284 @@ public class KycLogImpl implements KycLogIface {
         return mongoTemplate.find(query, AuditLog.class, "auditlogs");
     }
 
+//    public List<OrgKycSummaryDto> getOrgKycSummary() {
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime startOfMonth = now.withDayOfMonth(1).with(LocalTime.MIN);
+//        LocalDateTime startOfYear = now.withDayOfYear(1).with(LocalTime.MIN);
+//        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+//
+//        List<OrgKycSummaryDto> summaryList = new ArrayList<>();
+//
+//        // Step 1: Get all orgs
+//        List<Document> orgs = mongoTemplate.findAll(Document.class, "organization-list");
+//
+//        for (Document org : orgs) {
+//            String orgId = org.getString("orgId");
+//            String orgName = org.getString("orgName");
+//            String logo = org.getString("orgLogo");
+//            String spocEmail = org.getString("spocEmail");
+//            String spocName = org.getString("spocName");
+//            String spocMobile = org.getString("spocMobileNumber");
+//
+//            // Step 2: Fetch KYC logs for this org
+//            Query query = new Query();
+//            query.addCriteria(Criteria.where("transactionType").is("KYC")
+//                    .and("serviceProviderName").is(orgId));
+//
+//            List<Document> logs = mongoTemplate.find(query, Document.class, "auditlogs");
+//
+//            long totalSuccess = 0;
+//            long totalFailed = 0;
+//            long monthSuccess = 0;
+//            long monthFailed = 0;
+//            long yearSuccess = 0;
+//            long yearFailed = 0;
+//            LocalDateTime lastSuccess = null;
+//            LocalDateTime lastFailed = null;
+//
+//            // Initialize 12-month map
+//            Map<String, KycMonthlyStats> monthlyStats = new LinkedHashMap<>();
+//            for (int i = 11; i >= 0; i--) {
+//                YearMonth ym = YearMonth.now().minusMonths(i);
+//                String ymKey = ym.format(monthFormatter);
+//                monthlyStats.put(ymKey, new KycMonthlyStats());
+//            }
+//
+//            for (Document log : logs) {
+//                String type = log.getString("logMessageType");
+//                Object tsRaw = log.get("timestamp");
+//
+//                LocalDateTime ts = null;
+//                if (tsRaw instanceof Date) {
+//                    ts = ((Date) tsRaw).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//                } else if (tsRaw instanceof String) {
+//                    try {
+//                        ts = LocalDateTime.parse((String) tsRaw, DateTimeFormatter.ISO_DATE_TIME);
+//                    } catch (Exception ignored) {
+//                        //
+//                    }
+//                }
+//
+//
+//                boolean isSuccess = "SUCCESS".equalsIgnoreCase(type);
+//                boolean isFailed = "FAILURE".equalsIgnoreCase(type);
+//
+//                if (isSuccess) totalSuccess++;
+//                if (isFailed) totalFailed++;
+//
+//                if (ts.isAfter(startOfMonth)) {
+//                    if (isSuccess) monthSuccess++;
+//                    if (isFailed) monthFailed++;
+//                }
+//
+//                if (ts.isAfter(startOfYear)) {
+//                    if (isSuccess) yearSuccess++;
+//                    if (isFailed) yearFailed++;
+//                }
+//
+//                if (isSuccess && (lastSuccess == null || ts.isAfter(lastSuccess))) {
+//                    lastSuccess = ts;
+//                }
+//
+//                if (isFailed && (lastFailed == null || ts.isAfter(lastFailed))) {
+//                    lastFailed = ts;
+//                }
+//
+//                String monthKey = YearMonth.from(ts).format(monthFormatter);
+//                if (monthlyStats.containsKey(monthKey)) {
+//                    KycMonthlyStats stat = monthlyStats.get(monthKey);
+//                    if (isSuccess) stat.setSuccessCount(stat.getSuccessCount() + 1);
+//                    if (isFailed) stat.setFailedCount(stat.getFailedCount() + 1);
+//                }
+//            }
+//
+//            // Step 3: Build DTO
+//            OrgKycSummaryDto summary = new OrgKycSummaryDto();
+//            summary.setOrgId(orgId);
+//            summary.setOrgName(orgName);
+//            summary.setOrgLogo(logo);
+//            summary.setSpocEmail(spocEmail);
+//            summary.setSpocName(spocName);
+//            summary.setSpocMobileNumber(spocMobile);
+//            summary.setTotalKycCountSuccessful(totalSuccess);
+//            summary.setTotalKycCountFailed(totalFailed);
+//            summary.setTotalKycCountSuccessfulCurrentMonth(monthSuccess);
+//            summary.setTotalKycCountFailedCurrentMonth(monthFailed);
+//            summary.setTotalKycCountSuccessfulCurrentYear(yearSuccess);
+//            summary.setTotalKycCountFailedCurrentYear(yearFailed);
+//            summary.setLastKycSuccessfulTimestamp(lastSuccess);
+//            summary.setLastKycFailedTimestamp(lastFailed);
+//            summary.setMonthlyStats(monthlyStats);
+//
+//            summaryList.add(summary);
+//        }
+//
+//        return summaryList;
+//    }
+
     public List<OrgKycSummaryDto> getOrgKycSummary() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startOfMonth = now.withDayOfMonth(1).with(LocalTime.MIN);
-        LocalDateTime startOfYear = now.withDayOfYear(1).with(LocalTime.MIN);
+        LocalDate now = LocalDate.now();
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
 
-        List<OrgKycSummaryDto> summaryList = new ArrayList<>();
+        String currentMonthPrefix = now.getYear() + "-" + String.format("%02d", now.getMonthValue());
+        String currentYearPrefix  = String.valueOf(now.getYear());
+
 
         // Step 1: Get all orgs
         List<Document> orgs = mongoTemplate.findAll(Document.class, "organization-list");
 
+        // Step 2: Fetch ALL org-based counts in ONE query, grouped by orgId + year-month
+        AggregationResults<Document> aggResults = mongoTemplate.aggregate(
+                Aggregation.newAggregation(
+                        Aggregation.project()
+                                .and(StringOperators.SubstrCP.valueOf("identifier").substringCP(0, 4)).as("year")
+                                .and(StringOperators.SubstrCP.valueOf("identifier").substringCP(5, 2)).as("month")
+                                .andInclude("orgId", "kycSuccCount", "kycFailCount", "identifier"),
+                        Aggregation.group(Fields.fields("orgId", "year", "month"))
+                                .sum("kycSuccCount").as("totalSuccess")
+                                .sum("kycFailCount").as("totalFail")
+                                .last("identifier").as("identifier")
+                ),
+                "orgid-based-count",
+                Document.class
+        );
+
+        // Step 3: Group results by orgId
+        Map<String, List<Document>> byOrg = new HashMap<>();
+        for (Document doc : aggResults.getMappedResults()) {
+            Document id = (Document) doc.get("_id");
+            String orgId = id.getString("orgId");
+            byOrg.computeIfAbsent(orgId, k -> new ArrayList<>()).add(doc);
+        }
+
+        // Step 4: Build DTOs
+        List<OrgKycSummaryDto> summaryList = new ArrayList<>();
+
+
+        AggregationResults<Document> lastTimestampResults = mongoTemplate.aggregate(
+                Aggregation.newAggregation(
+                        Aggregation.match(
+                                Criteria.where("transactionType").is("KYC")
+                                        .and("logMessageType").in("SUCCESS", "FAILURE")
+                        ),
+                        Aggregation.sort(Sort.Direction.DESC, "timestamp"),
+                        Aggregation.group(Fields.fields("orgId", "logMessageType"))
+                                .first("timestamp").as("lastTimestamp")
+                ),
+                "auditlogs",
+                Document.class
+        );
+
+// Map: orgId -> { "SUCCESS" -> timestamp, "FAILURE" -> timestamp }
+        Map<String, Map<String, LocalDateTime>> lastTimestampMap = new HashMap<>();
+        for (Document doc : lastTimestampResults.getMappedResults()) {
+            Document id         = (Document) doc.get("_id");
+            String orgId        = id.getString("orgId");         // make sure field name matches your auditlogs
+            String logType      = id.getString("logMessageType");
+            LocalDateTime ts    = parseTimestamp(doc.get("lastTimestamp"));
+
+            lastTimestampMap
+                    .computeIfAbsent(orgId, k -> new HashMap<>())
+                    .put(logType, ts);
+        }
+
+
         for (Document org : orgs) {
-            String orgId = org.getString("orgId");
-            String orgName = org.getString("orgName");
-            String logo = org.getString("orgLogo");
-            String spocEmail = org.getString("spocEmail");
-            String spocName = org.getString("spocName");
-            String spocMobile = org.getString("spocMobileNumber");
+            String orgId      = org.getString("orgId");
+            List<Document> orgDocs = byOrg.getOrDefault(orgId, Collections.emptyList());
 
-            // Step 2: Fetch KYC logs for this org
-            Query query = new Query();
-            query.addCriteria(Criteria.where("transactionType").is("KYC")
-                    .and("serviceProviderName").is(orgId));
-
-            List<Document> logs = mongoTemplate.find(query, Document.class, "auditlogs");
-
-            long totalSuccess = 0;
-            long totalFailed = 0;
-            long monthSuccess = 0;
-            long monthFailed = 0;
-            long yearSuccess = 0;
-            long yearFailed = 0;
-            LocalDateTime lastSuccess = null;
-            LocalDateTime lastFailed = null;
+            long totalSuccess  = 0;
+            long totalFailed   = 0;
+            long monthSuccess  = 0;
+            long monthFailed   = 0;
+            long yearSuccess   = 0;
+            long yearFailed    = 0;
 
             // Initialize 12-month map
             Map<String, KycMonthlyStats> monthlyStats = new LinkedHashMap<>();
             for (int i = 11; i >= 0; i--) {
-                YearMonth ym = YearMonth.now().minusMonths(i);
-                String ymKey = ym.format(monthFormatter);
-                monthlyStats.put(ymKey, new KycMonthlyStats());
+                String key = YearMonth.now().minusMonths(i).format(monthFormatter);
+                monthlyStats.put(key, new KycMonthlyStats());
             }
 
-            for (Document log : logs) {
-                String type = log.getString("logMessageType");
-                Object tsRaw = log.get("timestamp");
+            for (Document doc : orgDocs) {
+                Document idDoc  = (Document) doc.get("_id");
+                String year     = idDoc.getString("year");
+                String month    = idDoc.getString("month");
+                String ymPrefix = year + "-" + month;
 
-                LocalDateTime ts = null;
-                if (tsRaw instanceof Date) {
-                    ts = ((Date) tsRaw).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                } else if (tsRaw instanceof String) {
-                    try {
-                        ts = LocalDateTime.parse((String) tsRaw, DateTimeFormatter.ISO_DATE_TIME);
-                    } catch (Exception ignored) {
-                        //
+                long success = ((Number) doc.get("totalSuccess")).longValue();
+                long fail    = ((Number) doc.get("totalFail")).longValue();
+
+                totalSuccess += success;
+                totalFailed  += fail;
+
+                // Current month
+                if (ymPrefix.equals(currentMonthPrefix)) {
+                    monthSuccess += success;
+                    monthFailed  += fail;
+                }
+
+                // Current year
+                if (year.equals(currentYearPrefix)) {
+                    yearSuccess += success;
+                    yearFailed  += fail;
+                }
+
+                // 12-month breakdown
+                try {
+                    YearMonth ym      = YearMonth.parse(ymPrefix, DateTimeFormatter.ofPattern("yyyy-MM"));
+                    String monthKey   = ym.format(monthFormatter);
+                    if (monthlyStats.containsKey(monthKey)) {
+                        KycMonthlyStats stat = monthlyStats.get(monthKey);
+                        stat.setSuccessCount(stat.getSuccessCount() + success);
+                        stat.setFailedCount(stat.getFailedCount() + fail);
                     }
-                }
-
-
-
-                boolean isSuccess = "SUCCESS".equalsIgnoreCase(type);
-                boolean isFailed = "FAILURE".equalsIgnoreCase(type);
-
-                if (isSuccess) totalSuccess++;
-                if (isFailed) totalFailed++;
-
-                if (ts.isAfter(startOfMonth)) {
-                    if (isSuccess) monthSuccess++;
-                    if (isFailed) monthFailed++;
-                }
-
-                if (ts.isAfter(startOfYear)) {
-                    if (isSuccess) yearSuccess++;
-                    if (isFailed) yearFailed++;
-                }
-
-                if (isSuccess && (lastSuccess == null || ts.isAfter(lastSuccess))) {
-                    lastSuccess = ts;
-                }
-
-                if (isFailed && (lastFailed == null || ts.isAfter(lastFailed))) {
-                    lastFailed = ts;
-                }
-
-                String monthKey = YearMonth.from(ts).format(monthFormatter);
-                if (monthlyStats.containsKey(monthKey)) {
-                    KycMonthlyStats stat = monthlyStats.get(monthKey);
-                    if (isSuccess) stat.setSuccessCount(stat.getSuccessCount() + 1);
-                    if (isFailed) stat.setFailedCount(stat.getFailedCount() + 1);
-                }
+                } catch (Exception ignored) {}
             }
 
-            // Step 3: Build DTO
             OrgKycSummaryDto summary = new OrgKycSummaryDto();
             summary.setOrgId(orgId);
-            summary.setOrgName(orgName);
-            summary.setOrgLogo(logo);
-            summary.setSpocEmail(spocEmail);
-            summary.setSpocName(spocName);
-            summary.setSpocMobileNumber(spocMobile);
+            summary.setOrgName(org.getString("orgName"));
+            summary.setOrgLogo(org.getString("orgLogo"));
+            summary.setSpocEmail(org.getString("spocEmail"));
+            summary.setSpocName(org.getString("spocName"));
+            summary.setSpocMobileNumber(org.getString("spocMobileNumber"));
             summary.setTotalKycCountSuccessful(totalSuccess);
             summary.setTotalKycCountFailed(totalFailed);
             summary.setTotalKycCountSuccessfulCurrentMonth(monthSuccess);
             summary.setTotalKycCountFailedCurrentMonth(monthFailed);
             summary.setTotalKycCountSuccessfulCurrentYear(yearSuccess);
             summary.setTotalKycCountFailedCurrentYear(yearFailed);
+            summary.setMonthlyStats(monthlyStats);
+
+
+            Map<String, LocalDateTime> tsMap = lastTimestampMap.getOrDefault(orgId, Collections.emptyMap());
+            LocalDateTime lastSuccess = tsMap.get("SUCCESS");
+            LocalDateTime lastFailed  = tsMap.get("FAILURE");
+
             summary.setLastKycSuccessfulTimestamp(lastSuccess);
             summary.setLastKycFailedTimestamp(lastFailed);
-            summary.setMonthlyStats(monthlyStats);
 
             summaryList.add(summary);
         }
 
         return summaryList;
     }
+
+
+
+    private LocalDateTime parseTimestamp(Object tsRaw) {
+        if (tsRaw instanceof Date) {
+            return ((Date) tsRaw).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (tsRaw instanceof String) {
+            try {
+                return LocalDateTime.parse((String) tsRaw, DateTimeFormatter.ISO_DATE_TIME);
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
 
     public OrgKycSummaryDto getOrgKycSummaryByOrgId(String orgId) {
         LocalDateTime now = LocalDateTime.now();
@@ -631,11 +790,139 @@ public class KycLogImpl implements KycLogIface {
 
         return dto;
     }
+//    public KycOverallStatsDto getKycOverallStats() {
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime startOfMonth = now.withDayOfMonth(1).with(LocalTime.MIN);
+//
+//        // Step 1: Org counts
+//        long totalOrgs = mongoTemplate.count(new Query(), "organization-list");
+//        Query newOrgQuery = new Query(Criteria.where("inserted_at").gte(startOfMonth));
+//        long newOrgsThisMonth = mongoTemplate.count(newOrgQuery, "organization-list");
+//
+//        // Step 2: Overall KYC success/failure counts
+//        AggregationResults<Document> results = mongoTemplate.aggregate(
+//                Aggregation.newAggregation(
+//                        Aggregation.group()
+//                                .sum("kycSucccount").as("totalSuccess")
+//                                .sum("kycFailcount").as("totalFail")
+//                ),
+//                "servicename-based-count",
+//                Document.class
+//        );
+//
+//        Document result = results.getUniqueMappedResult();
+//        long totalSuccess = result != null ? ((Number) result.get("totalSuccess")).longValue() : 0L;
+//        long totalFailed = result != null ? ((Number) result.get("totalFail")).longValue() : 0L;
+//
+//        // Step 3: This month's KYC success/failure
+//        // Get current month and year
+//        String monthPrefix = now.getYear() + "-" + String.format("%02d", now.getMonthValue()); // "2026-03"
+//
+//        AggregationResults<Document> results2 = mongoTemplate.aggregate(
+//                Aggregation.newAggregation(
+//                        Aggregation.match(
+//                                Criteria.where("identifier").regex("^" + monthPrefix)
+//                        ),
+//                        Aggregation.group()
+//                                .sum("kycSucccount").as("successThisMonthCount")
+//                                .sum("kycFailcount").as("failedThisMonthCount")
+//                ),
+//                "servicename-based-count",
+//                Document.class
+//        );
+//
+//        Document result2 = results2.getUniqueMappedResult();
+//        long successThisMonthCount = result2 != null ? ((Number) result2.get("successThisMonthCount")).longValue() : 0L;
+//        long failedThisMonthCount = result2 != null ? ((Number) result2.get("failedThisMonthCount")).longValue() : 0L;
+//
+//        long totalKycsThisMonth = successThisMonthCount + failedThisMonthCount;
+//
+//        // Step 4: Distinct services
+//
+//        // Step 5: Aggregate per-service stats
+//        AggregationResults<Document> result3 = mongoTemplate.aggregate(
+//                Aggregation.newAggregation(
+//                        Aggregation.group("serviceName")
+//                                .sum("kycSucccount").as("totalSuccess")
+//                                .sum("kycFailcount").as("totalFail")
+//                ),
+//                "servicename-based-count",
+//                Document.class
+//        );
+//
+//        Map<String, KycStatsDto> serviceStats = new LinkedHashMap<>();
+//
+//        for (Document doc : result3.getMappedResults()) {
+//            String serviceName = doc.getString("_id");
+//
+//            KycStatsDto stats = new KycStatsDto();
+//            stats.setSuccessCount(((Number) doc.get("totalSuccess")).longValue());
+//            stats.setFailedCount(((Number) doc.get("totalFail")).longValue());
+//            serviceStats.put(serviceName, stats);
+//        }
+//
+//        // Step 6: Monthly stats for last 12 months (chronologically sorted)
+//        Map<String, Map<String, Long>> monthlyStats = new TreeMap<>(new MonthYearComparator());
+//
+//        String startPrefix = now.minusMonths(11).getYear() + "-" +
+//                String.format("%02d", now.minusMonths(11).getMonthValue()) + "-01";
+//        String endPrefix   = now.getYear() + "-" +
+//                String.format("%02d", now.getMonthValue()) + "-31";
+//
+//        AggregationResults<Document> result4 = mongoTemplate.aggregate(
+//                Aggregation.newAggregation(
+//                        Aggregation.match(
+//                                Criteria.where("identifier").gte(startPrefix).lte(endPrefix)
+//                        ),
+//                        Aggregation.project()
+//                                .and(StringOperators.SubstrCP.valueOf("identifier").substringCP(0, 4)).as("year")
+//                                .and(StringOperators.SubstrCP.valueOf("identifier").substringCP(5, 2)).as("month")
+//                                .andInclude("kycSucccount", "kycFailcount"),
+//                        Aggregation.group(Fields.fields("year", "month"))
+//                                .sum("kycSucccount").as("totalSuccess")
+//                                .sum("kycFailcount").as("totalFail")
+//                ),
+//                "servicename-based-count",
+//                Document.class
+//        );
+//
+//        Map<String, Document> resultMap = new HashMap<>();
+//        for (Document doc : result4.getMappedResults()) {
+//            Document id = (Document) doc.get("_id");
+//            String key = id.getString("year") + "-" + id.getString("month");
+//            resultMap.put(key, doc);
+//        }
+//
+//        for (int i = 11; i >= 0; i--) {
+//            LocalDate month = LocalDate.from(now.minusMonths(i));
+//            String prefix    = month.getYear() + "-" + String.format("%02d", month.getMonthValue());
+//            String monthName = month.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+//                    + " " + month.getYear();
+//
+//            Document doc = resultMap.get(prefix);
+//            Map<String, Long> counts = new HashMap<>();
+//            counts.put("successCount", doc != null ? ((Number) doc.get("totalSuccess")).longValue() : 0L);
+//            counts.put("failedCount",  doc != null ? ((Number) doc.get("totalFail")).longValue()    : 0L);
+//            monthlyStats.put(monthName, counts);
+//        }
+//
+//        // Step 7: Build DTO
+//        KycOverallStatsDto dto = new KycOverallStatsDto();
+//        dto.setTotalServiceProviders(totalOrgs);
+//        dto.setNewServiceProvidersThisMonth(newOrgsThisMonth);
+//        dto.setTotalSuccessfulKycs(totalSuccess);
+//        dto.setTotalSuccessfulKycsThisMonth(successThisMonthCount);
+//        dto.setTotalFailedKycs(totalFailed);
+//        dto.setTotalKycsThisMonth(totalKycsThisMonth);
+//        dto.setServiceStats(serviceStats);
+//        dto.setMonthlyStats(monthlyStats);
+//
+//        return dto;
+//    }
 
 
     public PageResultDto getLogsByIdentifier(IdentifierLogFilterDto dto) {
         Query query = new Query();
-
 
 
         if (dto.getIdentifier() != null && !dto.getIdentifier().trim().isEmpty()) {
@@ -704,44 +991,50 @@ public class KycLogImpl implements KycLogIface {
 
     public ResponseEntity<String> ServiceNameBasedCountMethod(KycAuditDto dto) {
         try {
-            String date = dto.getTimestamp().substring(0, 10);
-            Optional<KycServiceNameBasedCount> existing = serviceNameBasedCountRepository.findByIdentifierAndServiceName(date, dto.getServiceName());
-
-            if (existing.isPresent()) {
-
-                System.out.println("Log Message from DTO: '" + dto.getLogMessageType() + "'");
-                KycServiceNameBasedCount summary = existing.get();
-                System.out.println("document  " + summary);
-                if ("SUCCESS".equalsIgnoreCase(dto.getLogMessageType().name().trim())) {
-                    System.out.println("inside sucess");
-                    summary.setKycSucccount(summary.getKycSucccount() + 1);
-                }
-                if ("FAILURE".equalsIgnoreCase(dto.getLogMessageType().name().trim())) {
-                    summary.setKycFailcount(summary.getKycFailcount() + 1);
-                }
-                summary.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                serviceNameBasedCountRepository.save(summary);
-                return new ResponseEntity<>("Record updated successfully", HttpStatus.OK);
-            } else {
-
-                KycServiceNameBasedCount newSummary = new KycServiceNameBasedCount();
-                newSummary.setIdentifier(date);
-                newSummary.setServiceName(dto.getServiceName());
-                if (dto.getLogMessageType().equals(LogMessageType.SUCCESS.toString())) {
-                    newSummary.setKycSucccount(1);
-                    newSummary.setKycFailcount(0);
-                } else if (dto.getLogMessageType().equals(LogMessageType.FAILURE.toString())) {
-                    newSummary.setKycSucccount(0);
-                    newSummary.setKycFailcount(1);
-                } else {
-                    newSummary.setKycSucccount(0);
-                    newSummary.setKycFailcount(0);
-                }
-                newSummary.setOrgId(null);
-                newSummary.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                serviceNameBasedCountRepository.save(newSummary);
-                return new ResponseEntity<>("New Record created successfully", HttpStatus.OK);
+            if(dto.getServiceName()==null || "OTHER".equals(dto.getServiceName()) || dto.getServiceName().isEmpty() ){
+                return new ResponseEntity<>("ServiceName Must be Specified Correctly", HttpStatus.BAD_REQUEST);
             }
+            else{
+                String date = dto.getTimestamp().substring(0, 10);
+                Optional<KycServiceNameBasedCount> existing = serviceNameBasedCountRepository.findByIdentifierAndServiceName(date, dto.getServiceName());
+
+                if (existing.isPresent()) {
+
+                    System.out.println("Log Message from DTO: '" + dto.getLogMessageType() + "'");
+                    KycServiceNameBasedCount summary = existing.get();
+                    System.out.println("document  " + summary);
+                    if ("SUCCESS".equalsIgnoreCase(dto.getLogMessageType().name().trim())) {
+                        System.out.println("inside sucess");
+                        summary.setKycSucccount(summary.getKycSucccount() + 1);
+                    }
+                    if ("FAILURE".equalsIgnoreCase(dto.getLogMessageType().name().trim())) {
+                        summary.setKycFailcount(summary.getKycFailcount() + 1);
+                    }
+                    summary.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                    serviceNameBasedCountRepository.save(summary);
+                    return new ResponseEntity<>("Record updated successfully", HttpStatus.OK);
+                } else {
+
+                    KycServiceNameBasedCount newSummary = new KycServiceNameBasedCount();
+                    newSummary.setIdentifier(date);
+                    newSummary.setServiceName(dto.getServiceName());
+                    if (dto.getLogMessageType().equals(LogMessageType.SUCCESS.toString())) {
+                        newSummary.setKycSucccount(1);
+                        newSummary.setKycFailcount(0);
+                    } else if (dto.getLogMessageType().equals(LogMessageType.FAILURE.toString())) {
+                        newSummary.setKycSucccount(0);
+                        newSummary.setKycFailcount(1);
+                    } else {
+                        newSummary.setKycSucccount(0);
+                        newSummary.setKycFailcount(0);
+                    }
+                    newSummary.setOrgId(null);
+                    newSummary.setUpdatedTime(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                    serviceNameBasedCountRepository.save(newSummary);
+                    return new ResponseEntity<>("New Record created successfully", HttpStatus.OK);
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Failed to update or create a record", HttpStatus.BAD_REQUEST);
@@ -750,8 +1043,12 @@ public class KycLogImpl implements KycLogIface {
 
     public ResponseEntity<String> upsertOrgidBasedCountSummary(KycAuditDto dto) {
         try {
+            if(dto.getServiceProviderName()==null || dto.getServiceProviderName().isEmpty()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("ServiceProvideName Must Be Specified Correctly");
+            }
             if (dto.getTimestamp() != null && dto.getTimestamp().length() >= 10) {
-                 //
+                //
             } else {
                 throw new IllegalArgumentException("Timestamp is missing or too short");
             }
@@ -789,21 +1086,21 @@ public class KycLogImpl implements KycLogIface {
 
     @Override
     public ApiResponse verifyOrganizationTransaction(KycTransactionDto kycTransactionDto) {
-        try{
-            if(kycTransactionDto.getIdentifier()==null || kycTransactionDto.getIdentifier().isEmpty()){
-                return new ApiResponse(true,"Identifier Cannot be null or empty",null);
+        try {
+            if (kycTransactionDto.getIdentifier() == null || kycTransactionDto.getIdentifier().isEmpty()) {
+                return new ApiResponse(true, "Identifier Cannot be null or empty", null);
             }
-            if(kycTransactionDto.getServiceName().isEmpty()){
-                return new ApiResponse(true,"Service Names List is empty",null);
+            if (kycTransactionDto.getServiceName().isEmpty()) {
+                return new ApiResponse(true, "Service Names List is empty", null);
             }
-            if(kycTransactionDto.getDate()==null||kycTransactionDto.getDate().isEmpty()){
-                return new ApiResponse(true,"Date cannot be null or empty",null);
+            if (kycTransactionDto.getDate() == null || kycTransactionDto.getDate().isEmpty()) {
+                return new ApiResponse(true, "Date cannot be null or empty", null);
             }
             Query query = new Query();
             query.addCriteria(Criteria.where("serviceName").in(kycTransactionDto.getServiceName()));
             query.addCriteria(Criteria.where("identifier").in(kycTransactionDto.getIdentifier()));
             LocalDateTime timestamp = convertToLocalDateTime(kycTransactionDto.getDate());
-            System.out.println("time stamp ---------------  "+ timestamp);
+            System.out.println("time stamp ---------------  " + timestamp);
             LocalDateTime dateTime = convertToLocalDateTime(kycTransactionDto.getDate());
             LocalDateTime startOfDay = dateTime.toLocalDate().atStartOfDay();
             LocalDateTime endOfDay = dateTime.toLocalDate().atTime(LocalTime.MAX);
@@ -811,40 +1108,37 @@ public class KycLogImpl implements KycLogIface {
             query.addCriteria(Criteria.where("timestamp").gte(startOfDay).lte(endOfDay));
             query.addCriteria(Criteria.where("logMessageType").is("SUCCESS"));
             boolean isSuccess = mongoTemplate.exists(query, "auditlogs");
-            if(isSuccess){
-                return new ApiResponse(true,"Found",true);
+            if (isSuccess) {
+                return new ApiResponse(true, "Found", true);
+            } else {
+                return new ApiResponse(true, "Not Found", false);
             }
-            else{
-                return new ApiResponse(true,"Not Found",false);
-            }
-        }
-        catch (Exception e){
-            return new ApiResponse(false,"",null);
+        } catch (Exception e) {
+            return new ApiResponse(false, "", null);
         }
 
     }
 
     @Override
     public ApiResponse getSubTransactionLog(String correlationId) {
-        try{
-            if(correlationId==null ||correlationId.isEmpty()){
-                return new ApiResponse(true,"correlationId Cannot be null or empty",null);
+        try {
+            if (correlationId == null || correlationId.isEmpty()) {
+                return new ApiResponse(true, "correlationId Cannot be null or empty", null);
             }
 
             Query query = new Query();
             query.addCriteria(Criteria.where("correlationID").is(correlationId));
 
-            AuditLog subLog = mongoTemplate.findOne(query,AuditLog.class ,"auditlogs");
-            List<AuditLog> ans = mongoTemplate.find(query,AuditLog.class ,"subTransactionsLog");
+            AuditLog subLog = mongoTemplate.findOne(query, AuditLog.class, "auditlogs");
+            List<AuditLog> ans = mongoTemplate.find(query, AuditLog.class, "subTransactionsLog");
             ans.add(subLog);
-            if(subLog==null){
-                return new ApiResponse(false,"No Log Found With Given CorrelationId",null);
+            if (subLog == null) {
+                return new ApiResponse(false, "No Log Found With Given CorrelationId", null);
             }
-            return new ApiResponse(true,"Log Found",ans);
+            return new ApiResponse(true, "Log Found", ans);
 
-        }
-        catch (Exception e){
-            return new ApiResponse(false,"",null);
+        } catch (Exception e) {
+            return new ApiResponse(false, "", null);
         }
 
     }

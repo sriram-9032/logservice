@@ -8,6 +8,7 @@ import com.dtt.logs.Model.ServiceAuditLog.SignatureType;
 import com.dtt.logs.Model.ServiceAuditLog.TransactionType;
 
 import com.dtt.logs.enums.central.AuthenticationType;
+import com.dtt.logs.enums.central.UserActivityType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -59,6 +60,8 @@ public class AuditDTO implements Serializable {
     private String checksum;
 
     private AuthenticationType authenticationType;
+
+    private UserActivityType userActivityType;
 
     public String getServiceName() {
         return serviceName;
@@ -213,6 +216,14 @@ public class AuditDTO implements Serializable {
         this.authenticationType = authenticationType;
     }
 
+    public UserActivityType getUserActivityType() {
+        return userActivityType;
+    }
+
+    public void setUserActivityType(UserActivityType userActivityType) {
+        this.userActivityType = userActivityType;
+    }
+
     @Override
     public String toString() {
         return "AuditDTO{" +
@@ -235,6 +246,7 @@ public class AuditDTO implements Serializable {
                 ", eSealUsed=" + eSealUsed +
                 ", checksum='" + checksum + '\'' +
                 ", authenticationType=" + authenticationType +
+                ", userActivityType=" + userActivityType +
                 '}';
     }
 }

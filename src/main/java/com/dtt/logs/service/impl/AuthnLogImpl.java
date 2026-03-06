@@ -143,7 +143,7 @@ public class AuthnLogImpl implements AuthnLogIface {
             String checksum= auditDTO.getChecksum();
             ServiceAuditLog auditLog= new ServiceAuditLog(identifier,correlationID,tid,stid,time,stime,etime,loc,callStack,serviceName,
                     transactionType,transactionSubType,logMessageType,msg,spname,spappname,
-                    signatureType,eseal,checksum ,auditDTO.getAuthenticationType());
+                    signatureType,eseal,checksum ,auditDTO.getAuthenticationType(),auditDTO.getUserActivityType());
             addAudit(auditLog);
             return auditLog;
         }catch(Exception e){
